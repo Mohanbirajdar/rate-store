@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Seed configuration
+generator seed {
+  provider = "prisma-client-js"
+  seed = "node --loader ts-node/esm prisma/seed.ts"
+}
+
+enum UserRole {
+  SYSTEM_ADMIN
+  NORMAL_USER
+  STORE_OWNER
+}
+
+// User model - handles all user types including store owners
+model User {
+  id        String   @id @default(cuid())
+  name      String   @db.VarChar(60)
+  email     String   @unique @db.VarChar(255)
+  password  String   @db.VarChar(255) // Will store hashed password
+  address   String   @db.VarChar(400)
+  role      UserRole @default(NORMAL_USER)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  store     Store?   @relation("StoreOwner") // One-to-one for store owners
+  ratings   Rating[] @relation("UserRatings") // Ratings submitted by this user
+  
+  @@index([email])
+  @@index([role])
+  @@index([name])
+  @@map("users")
+}
+
+// Store model
+model Store {
+  id      String @id @default(cuid())
+  name    String @db.VarChar(60)
+  email   String @unique @db.VarChar(255)
+  address String @db.VarChar(400)
+  
+  // Store owner relationship
+  ownerId String @unique
+  owner   User   @relation("StoreOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  ratings Rating[] @relation("StoreRatings")
+  
+  @@index([name])
+  @@index([email])
+  @@index([address])
+  @@map("stores")
+}
+
+// Rating model
+model Rating {
+  id     String @id @default(cuid())
+  value  Int    @db.Integer // Rating value from 1 to 5
+  
+  // User who submitted the rating
+  userId String
+  user   User   @relation("UserRatings", fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Store being rated
+  storeId String
+  store   Store  @relation("StoreRatings", fields: [storeId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Ensure one user can only rate a store once
+  @@unique([userId, storeId])
+  @@index([storeId])
+  @@index([userId])
+  @@map("ratings")
+}
