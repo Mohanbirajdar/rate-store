@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, Users } from "lucide-react";
 
 export default function StoreRatingsPage() {
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   type Rating = {
     id: string;
@@ -34,13 +36,36 @@ export default function StoreRatingsPage() {
   const [sortBy, setSortBy] = useState<string>("latest");
   const [filteredRatings, setFilteredRatings] = useState<Rating[]>([]);
 
+  // Client-side auth protection
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.replace("/login");
+        return;
+      }
+      if (user.role !== "STORE_OWNER") {
+        router.replace("/unauthorized");
+        return;
+      }
+    }
+  }, [user, authLoading, router]);
+
   useEffect(() => {
     const fetchStore = async () => {
+      // Don't fetch if not authenticated as store owner
+      if (!user || user.role !== "STORE_OWNER") {
+        setLoading(false);
+        return;
+      }
+      
       try {
         const response = await fetch("/api/store/info");
         if (response.ok) {
           const data = await response.json();
           setStore(data.store);
+        } else if (response.status === 401 || response.status === 403) {
+          router.replace("/unauthorized");
+          return;
         } else {
           setError("Failed to load store information");
         }
@@ -50,10 +75,10 @@ export default function StoreRatingsPage() {
         setLoading(false);
       }
     };
-    if (!authLoading) {
+    if (!authLoading && user) {
       fetchStore();
     }
-  }, [authLoading]);
+  }, [authLoading, user, router]);
 
   useEffect(() => {
     if (!store?.ratings) {

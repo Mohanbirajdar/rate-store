@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +29,7 @@ type StoreData = {
 };
 
 export default function StoreOwnerDashboardPage() {
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [store, setStore] = useState<StoreData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,13 +39,36 @@ export default function StoreOwnerDashboardPage() {
   const [filteredRatings, setFilteredRatings] = useState<any[]>([]);
   const searchSectionRef = useRef<HTMLDivElement>(null);
 
+  // Client-side auth protection
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.replace("/login");
+        return;
+      }
+      if (user.role !== "STORE_OWNER") {
+        router.replace("/unauthorized");
+        return;
+      }
+    }
+  }, [user, authLoading, router]);
+
   useEffect(() => {
     const fetchStore = async () => {
+      // Don't fetch if not authenticated as store owner
+      if (!user || user.role !== "STORE_OWNER") {
+        setLoading(false);
+        return;
+      }
+      
       try {
         const response = await fetch("/api/store/info");
         if (response.ok) {
           const data = await response.json();
           setStore(data.store);
+        } else if (response.status === 401 || response.status === 403) {
+          router.replace("/unauthorized");
+          return;
         } else {
           setError("Failed to load store information");
         }
@@ -53,10 +78,10 @@ export default function StoreOwnerDashboardPage() {
         setLoading(false);
       }
     };
-    if (!authLoading) {
+    if (!authLoading && user) {
       fetchStore();
     }
-  }, [authLoading]);
+  }, [authLoading, user, router]);
 
   // Filter and sort ratings
   useEffect(() => {
