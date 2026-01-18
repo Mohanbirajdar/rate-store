@@ -93,6 +93,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
     }
 
+    // Validate name length (20-60 characters)
+    if (name.length < 20 || name.length > 60) {
+      return NextResponse.json({ error: "Name must be between 20 and 60 characters" }, { status: 400 });
+    }
+
+    // Validate address length (max 400 characters)
+    if (address.length > 400) {
+      return NextResponse.json({ error: "Address must not exceed 400 characters" }, { status: 400 });
+    }
+
+    // Validate password (8-16 characters, uppercase, special character)
+    if (password.length < 8 || password.length > 16) {
+      return NextResponse.json({ error: "Password must be between 8 and 16 characters" }, { status: 400 });
+    }
+    if (!/[A-Z]/.test(password)) {
+      return NextResponse.json({ error: "Password must contain at least one uppercase letter" }, { status: 400 });
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return NextResponse.json({ error: "Password must contain at least one special character" }, { status: 400 });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
+    }
+
     // Validate role
     if (!["NORMAL_USER", "STORE_OWNER", "SYSTEM_ADMIN"].includes(role)) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });

@@ -24,7 +24,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Validate name length
-    if (name.length < 2 || name.length > 60) {
+    if (name.length < 20 || name.length > 60) {
       return NextResponse.json(
         { error: "Name must be between 2 and 60 characters" },
         { status: 400 }

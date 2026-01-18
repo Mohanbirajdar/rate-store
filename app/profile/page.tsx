@@ -74,8 +74,8 @@ export default function ProfilePage() {
       return;
     }
 
-    if (formData.name.length < 2 || formData.name.length > 60) {
-      setError("Name must be between 2 and 60 characters");
+    if (formData.name.length < 20 || formData.name.length > 60) {
+      setError("Name must be between 20 and 60 characters");
       setIsSaving(false);
       return;
     }

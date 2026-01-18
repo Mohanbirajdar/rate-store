@@ -133,7 +133,7 @@ export default function AdminDashboardPage() {
   const validateUserField = (name: string, value: string): string | undefined => {
     switch (name) {
       case "name":
-        if (value.length < 2) return "Name must be at least 2 characters";
+        if (value.length < 20) return "Name must be at least 20 characters";
         if (value.length > 60) return "Name must not exceed 60 characters";
         break;
       case "email":
@@ -141,8 +141,10 @@ export default function AdminDashboardPage() {
         if (!emailRegex.test(value)) return "Please enter a valid email address";
         break;
       case "password":
-        if (value.length < 6) return "Password must be at least 6 characters";
+        if (value.length < 8) return "Password must be at least 8 characters";
         if (value.length > 16) return "Password must not exceed 16 characters";
+        if (!/[A-Z]/.test(value)) return "Password must contain at least one uppercase letter";
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) return "Password must contain at least one special character";
         break;
       case "address":
         if (value.length > 400) return "Address must not exceed 400 characters";
@@ -156,7 +158,7 @@ export default function AdminDashboardPage() {
     switch (name) {
       case "ownerName":
       case "storeName":
-        if (value.length < 2) return "Name must be at least 2 characters";
+        if (value.length < 20) return "Name must be at least 20 characters";
         if (value.length > 60) return "Name must not exceed 60 characters";
         break;
       case "ownerEmail":
@@ -165,8 +167,10 @@ export default function AdminDashboardPage() {
         if (!emailRegex.test(value)) return "Please enter a valid email address";
         break;
       case "ownerPassword":
-        if (value.length < 6) return "Password must be at least 6 characters";
+        if (value.length < 8) return "Password must be at least 8 characters";
         if (value.length > 16) return "Password must not exceed 16 characters";
+        if (!/[A-Z]/.test(value)) return "Password must contain at least one uppercase letter";
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) return "Password must contain at least one special character";
         break;
       case "ownerAddress":
       case "storeAddress":
