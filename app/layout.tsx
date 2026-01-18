@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { FloatingDock } from "@/components/FloatingDock";
 import "./globals.css";
 
@@ -33,10 +34,13 @@ export default function RootLayout({
       >
         <ThemeProvider>
           <AuthProvider>
-            <div className="relative z-10">
+            <div className="relative z-10 flex flex-col min-h-screen">
               <Header />
               <FloatingDock />
-              {children}
+              <main className="flex-grow">
+                {children}
+              </main>
+              <Footer />
             </div>
           </AuthProvider>
         </ThemeProvider>
