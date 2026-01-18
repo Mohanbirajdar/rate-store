@@ -14,10 +14,12 @@ import {
   Zap,
   ArrowRight,
   Check,
+  LayoutDashboard,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useInView } from "@/lib/useInView";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 // Animated Section Component
 function AnimatedSection({
@@ -92,6 +94,22 @@ function StaggerItem({ children }: { children: React.ReactNode }) {
 
 export default function Home() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { user, loading } = useAuth();
+
+  // Get dashboard URL based on user role
+  const getDashboardUrl = () => {
+    if (!user) return "/login";
+    switch (user.role) {
+      case "SYSTEM_ADMIN":
+        return "/admin/dashboard";
+      case "STORE_OWNER":
+        return "/store/dashboard";
+      case "NORMAL_USER":
+        return "/user/stores";
+      default:
+        return "/login";
+    }
+  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -207,27 +225,36 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
             >
-              <Link href="/signup">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-8 py-6 text-lg"
+              {!loading && !user && (
+                <Link href="/signup">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    Get Started
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </motion.div>
-              </Link>
-              <Link href="/login">
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-8 py-6 text-lg"
+                    >
+                      Get Started
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </motion.div>
+                </Link>
+              )}
+              <Link href={user ? getDashboardUrl() : "/login"}>
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Button size="lg" variant="outline" className="px-8 py-6 text-lg">
-                    Sign In
+                    {user ? (
+                      <>
+                        <LayoutDashboard className="mr-2 h-5 w-5" />
+                        Dashboard
+                      </>
+                    ) : (
+                      "Sign In"
+                    )}
                   </Button>
                 </motion.div>
               </Link>
