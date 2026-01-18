@@ -42,6 +42,11 @@ export async function GET(request: NextRequest) {
             role: true,
           },
         },
+        ratings: {
+          select: {
+            value: true,
+          },
+        },
         _count: {
           select: { ratings: true },
         },
@@ -49,7 +54,21 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json({ stores });
+    // Calculate average rating for each store
+    const storesWithAvgRating = stores.map((store) => {
+      const avgRating = store.ratings.length > 0
+        ? store.ratings.reduce((sum, r) => sum + r.value, 0) / store.ratings.length
+        : null;
+      
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { ratings, ...storeWithoutRatings } = store;
+      return {
+        ...storeWithoutRatings,
+        averageRating: avgRating,
+      };
+    });
+
+    return NextResponse.json({ stores: storesWithAvgRating });
   } catch (error) {
     console.error("Error fetching stores:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

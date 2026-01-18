@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ interface ValidationErrors {
 
 export default function SignupPage() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
@@ -117,8 +119,11 @@ export default function SignupPage() {
         throw new Error(data.error || "Signup failed");
       }
 
-      // Redirect to login or dashboard
-      router.push("/login?registered=true");
+      // Refresh user state to update UI instantly
+      await refreshUser();
+
+      // Redirect to user dashboard (auto-logged in)
+      router.replace("/user/stores");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

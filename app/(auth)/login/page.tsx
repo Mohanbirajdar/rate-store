@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/providers/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,7 @@ import { motion } from "framer-motion";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
@@ -38,19 +40,22 @@ export default function LoginPage() {
         throw new Error(data.error || "Login failed");
       }
 
-      // Redirect based on user role
+      // Refresh user state to update UI instantly
+      await refreshUser();
+
+      // Redirect based on user role using replace to prevent back navigation issues
       switch (data.user.role) {
         case "SYSTEM_ADMIN":
-          router.push("/admin/dashboard");
+          router.replace("/admin/dashboard");
           break;
         case "STORE_OWNER":
-          router.push("/store/dashboard");
+          router.replace("/store/dashboard");
           break;
         case "NORMAL_USER":
-          router.push("/user/stores");
+          router.replace("/user/stores");
           break;
         default:
-          router.push("/");
+          router.replace("/");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");

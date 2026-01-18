@@ -29,9 +29,20 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching admin stats:", error);
+    
+    // Handle authentication/authorization errors properly
+    if (error instanceof Error) {
+      if (error.message === "Unauthorized") {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+      if (error.message === "Forbidden") {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+    }
+    
     return NextResponse.json(
       { error: "Failed to fetch statistics" },
-      { status: error instanceof Error && error.message === "Forbidden" ? 403 : 500 }
+      { status: 500 }
     );
   }
 }

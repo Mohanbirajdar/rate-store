@@ -349,9 +349,9 @@ export default function Home() {
               },
               {
                 icon: TrendingUp,
-                title: "Analytics & Stats",
+                title: "Real-time Updates",
                 description:
-                  "View detailed statistics about ratings, trends, and store performance metrics.",
+                  "See live rating updates as users submit reviews. Stores reflect feedback instantly.",
                 color: "green",
               },
               {

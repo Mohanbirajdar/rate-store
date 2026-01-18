@@ -52,7 +52,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
       setUser(null);
-      router.push("/login");
+      // Use replace to prevent going back to dashboard with browser back button
+      router.replace("/");
+      router.refresh();
     } catch (error) {
       console.error("Logout error:", error);
     }
