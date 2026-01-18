@@ -196,8 +196,8 @@ After running the seed command, you can use these credentials:
 | Role | Email | Password |
 |------|-------|----------|
 | **Admin** | admin@storerating.com | Admin@123 |
-| **Store Owner 1** | owner1@grocery.com | Store@123 |
-| **Store Owner 2** | owner2@electronics.com | Store@456 |
+| **Store Owner ** | storeowner1@example.com | Password@123 |
+| ** Normal User ** | user1@example.com | Password@123 |
 
 *Note: Normal users can be created via the signup page or by admin.*
 
