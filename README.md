@@ -163,12 +163,7 @@ Rating
 
 3. **Set up environment variables**
    
-   Create a `.env` file in the root directory:
-   ```env
-   DATABASE_URL="postgresql://username:password@localhost:5432/ratestore"
-   DIRECT_URL="postgresql://username:password@localhost:5432/ratestore"
-   JWT_SECRET="your-super-secret-jwt-key-change-in-production"
-   ```
+   
 
 4. **Run database migrations**
    ```bash
